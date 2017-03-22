@@ -50,6 +50,11 @@ func NewSyslogAdapter(route *router.Route) (router.LogAdapter, error) {
 	}
 	data := getopt("SYSLOG_DATA", "{{.Data}}")
 	timestamp := getopt("SYSLOG_TIMESTAMP", "{{.Timestamp}}")
+	logmaticKey := getopt("LOGMATIC_API_KEY", "")
+
+	if logmaticKey == "" {
+		return nil, errors.New("missing LOGMATIC_API_KEY")
+	}
 
 	if structuredData == "" {
 		structuredData = "-"
@@ -60,11 +65,8 @@ func NewSyslogAdapter(route *router.Route) (router.LogAdapter, error) {
 	var tmplStr string
 	switch format {
 	case "rfc5424":
-		tmplStr = fmt.Sprintf("<%s>1 %s %s %s %s - %s %s\n",
-			priority, timestamp, hostname, tag, pid, structuredData, data)
-	case "rfc3164":
-		tmplStr = fmt.Sprintf("<%s>%s %s %s[%s]: %s\n",
-			priority, timestamp, hostname, tag, pid, data)
+		tmplStr = fmt.Sprintf("%s <%s>1 %s %s %s %s - %s %s\n",
+			logmaticKey, priority, timestamp, hostname, tag, pid, structuredData, data)
 	default:
 		return nil, errors.New("unsupported syslog format: " + format)
 	}
