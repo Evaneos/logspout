@@ -1,4 +1,4 @@
-NAME=logspout
+NAME=evaneos/logmatic-logspout
 VERSION=$(shell cat VERSION)
 
 build-dev:
@@ -16,7 +16,6 @@ dev: build-dev
 build:
 	mkdir -p build
 	docker build -t $(NAME):$(VERSION) .
-	docker save $(NAME):$(VERSION) | gzip -9 > build/$(NAME)_$(VERSION).tgz
 
 test: build-dev
 	docker run \
